@@ -1,0 +1,257 @@
+<script>
+function vphistory_onchange(f){
+	if(!f.value)return;
+	for(var i = 0; i < g_lastdata.length; i++){
+		if(g_lastdata[i].id==f.value){
+			proc_loadgame(g_lastdata[i].url, g_lastdata[i].resp,true);
+			break;
+		}
+	}
+}
+
+var g_lastdata2;
+var g_lastdata=[];
+function proc_loadgame(url, resp, ishistory){
+	g_lastdata2={};
+	g_lastdata2.url=url;
+	g_lastdata2.resp=resp;
+
+	if(!ishistory){
+		for(var i = 0; i < g_lastdata.length; i++){
+			if(g_lastdata[i].resp.id==resp.id){
+				g_lastdata.splice(i,1);
+				break;
+			}
+		}
+		var a={};
+		a.id=(new Date()).getTime();
+		a.url=url;
+		a.resp=resp;
+		g_lastdata.push(a);
+		if(g_lastdata.length>5){
+			g_lastdata.splice(0,1);
+		}
+		var s='History &nbsp;<select onchange="vphistory_onchange(this)" style="width:350px">';
+		for(var i=g_lastdata.length-1;i>=0;i--){
+			s+='<option value="'+g_lastdata[i].id+'">'+henc(g_lastdata[i].resp.title || 'No Name');
+		}
+		s+='</select>';
+		_getid('vphistory').innerHTML=s;
+	}
+
+	var a=_getid('codearea');	
+	a.innerHTML='<div id="emulator"></div>';
+	a.data=resp.id;
+	_getid('btn_refresh').disabled=false;
+	_getid('btn_close').disabled=false;
+
+	var system='';
+	function go2(){
+		check_flash();
+		/*if(!okflash){
+			var s='<font style="color:#aa2222">Adobe Flash Player is required. Check the flash player is installed.</font>';
+			s+='<br><a href="http://www.adobe.com/go/getflashplayer" target="_blank">Get Adobe Flash player</a>';
+			_getid('emulator').innerHTML=s;				
+			return;
+		}*/
+		var flashvars =  {
+			system : system,
+			url : url
+		};
+		var flashvars2 = Object.keys(flashvars).map(function(k){
+			return encodeURIComponent(k) + '=' + encodeURIComponent(flashvars[k])
+		}).join('&');
+		var s='';
+		if (!okflash) s+='<div style="margin-bottom:5px"><font style="color:#aa2222">Adobe Flash Player is required. Check the flash player is installed.</font></div>';
+		s+='<object type="application/x-shockwave-flash" data="swf/Nesbox.swf" width="640" height="480" id="emulator" style="visibility: visible;"><param name="allowscriptaccess" value="sameDomain"><param name="allowFullScreen" value="true"><param name="allowFullScreenInteractive" value="true"><param name="flashvars" value="'+flashvars2+'"></object>';
+		_getid('codearea').innerHTML=s;
+
+		/*var params = {};
+		var attributes = {};
+		params.allowscriptaccess = 'sameDomain';
+		params.allowFullScreen = 'true';
+		params.allowFullScreenInteractive = 'true';
+		swfobject.embedSWF('swf/Nesbox.swf', 'emulator', '640', '480', '11.2.0', 'swf/expressInstall.swf', flashvars, params, attributes);*/
+	}
+	function go(){
+		if(url.indexOf("sample/")==0){
+			go2();
+			return;
+		}
+		try{
+			var xhr = new XMLHttpRequest();
+			xhr.open('HEAD', url);
+			xhr.onload = function(){
+				if(this.status == 200){
+					go2();
+				}else{
+					gd_login(function(result){
+						if(!result) return;
+						gd_loadfile(resp.id,false,function(surl){
+							if(g_lastdata2.url==url) g_lastdata2.url=surl;
+							for(var i = 0; i < g_lastdata.length; i++){
+								if(g_lastdata[i].resp.id==resp.id){
+									g_lastdata[i].url=surl;
+									break;
+								}
+							}
+							url=surl;
+							go2();
+						});
+					},true);
+				}
+			}				
+			xhr.onerror = function(e){      
+				alert('Error. Can not find a file.');
+			}
+			xhr.send();
+		}catch(err){
+			alert(err+'nnor This browser does not support. Please upgrade your browser.');
+		}
+	}
+
+	var ext=getextension(resp.title);	
+	if(resp.romsystem) system=resp.romsystem;
+	else{
+		for(var i=0; i <= supportexts.length-1; i++){
+			if(supportexts[i].ext==ext){
+				system=supportexts[i].system;
+				break;
+			}
+		}		
+		if(!system || ext=='zip'){
+				var s1=henc(resp.title)+'<br><b>This is ZIP format or Unknown format. Select a ROM type, system:</b><br><br>';
+				var prefer=getstorage('em_c_prefer_ext');
+				var list=[];
+				for(var i=0; i <= supportexts.length-1; i++){
+					if(supportexts[i].ext=='zip')continue;
+					s1+='<label style="cursor:pointer"><input type=radio name=gdsel value="'+i+'"';
+					if(prefer==supportexts[i].ext) s1+=' checked=true';
+					s1+='> '+supportexts[i].name;
+					s1+=' (*.'+supportexts[i].ext+')';
+					s1+='</label><br><br>';
+				}				
+				var gwin=_getid("gd_window");
+				gwin.innerHTML='<table><tr><td>'+s1+'<tr><td align=center><button type=button id="gd_ok" style="font-size:17px">OK</button> <button type=button id="gd_cancel" style="font-size:17px">Cancel</button></table>';
+				gwin.style.display='';
+				gd_btn_login2(false,function(){
+					_getid('gd_ok').focus();
+				});
+				function selok(){
+					gwin.style.display='none';
+					_getid("gd_frame").style.display='none';
+					var ans;
+					var radios = gwin.getElementsByTagName('input');
+					for(var i = 0; i < radios.length; i++){
+						if(radios[i].type=='radio' && radios[i].checked){
+							ans=radios[i].value;
+							break;
+						}
+					}					
+					ans=parseInt(ans);
+					if(supportexts[ans]){
+						setstorage('em_c_prefer_ext',supportexts[ans].ext);
+						system=supportexts[ans].system;
+						go();
+					}else{
+						alert('No selected.');
+					}
+				}
+				var a=gwin.getElementsByTagName('label');
+				for(var i = 0; i < a.length; i++){
+					a[i].ondblclick=selok;
+				}
+				_getid('gd_ok').onclick=selok;
+				_getid('gd_cancel').onclick=function(){
+					gwin.style.display='none';
+					_getid("gd_frame").style.display='none';
+				}
+			return;
+		}
+	}
+	go();
+}
+
+var supportexts=[{ext:'nes',system:'nes',name:'NES'},{ext:'smc',system:'snes',name:'SNES'},{ext:'gen',system:'sega',name:'SEGA'},{ext:'gb',system:'gb',name:'GAMEBOY'},{ext:'gbc',system:'gb',name:'GAMEBOY COLOR'},{ext:'gba',system:'gba',name:'GAMEBOY ADVANCE'},{ext:'zip',system:'',name:'Zipped File'}];
+var resizeOwnEmulator = function(width, height){
+	var emulator = $('#emulator');
+	emulator.css('width', width);
+	emulator.css('height', height);
+}
+
+function proc_sample(filename,romsystem){
+	var resp={};
+	resp.id='(Sample) '+filename;
+	resp.title=resp.id;
+	resp.downloadUrl="sample/"+filename;
+	resp.romsystem=romsystem;
+	proc_loadgame(resp.downloadUrl, resp);
+}
+
+var g_maxsize=25;
+function proc_openurl(){
+	var s1='Enter a ROM URL. (http:// or https://)nnThe maximum download size is about '+g_maxsize+' megabytes.';
+	var s=getstorage('em_c_lasturl') || '';
+	var surl=prompt(s1,s);			
+	if(!surl)return;
+	setstorage('em_c_lasturl',surl);
+
+	var resp={};
+	resp.id=getFileName(surl) || 'No Name';
+	resp.title=resp.id;
+	resp.downloadUrl=surl;
+	gd_login(function(result){
+		if(!result) return;
+		gd_loadfile('',resp);
+	},true);
+}
+
+var okflash=null;
+function check_flash(){
+	if(okflash!=null)return;
+	okflash=false;
+	try{
+		if(new ActiveXObject('ShockwaveFlash.ShockwaveFlash'))okflash=true;
+	}catch(e){
+		var a=navigator.mimeTypes;
+		if(a && a['application/x-shockwave-flash'] != undefined && a['application/x-shockwave-flash'].enabledPlugin)okflash=true;
+	}
+}
+function proc_new(){
+	if(!_getid('emulator')){
+		var a=_getid('codearea');	
+		a.innerHTML='<div id="emulator"></div>';
+	}
+	check_flash();
+	/*if(!okflash){
+		var s='<font style="color:#aa2222">Adobe Flash Player is required. Check the flash player is installed.</font>';
+		s+='<br><a href="http://www.adobe.com/go/getflashplayer" target="_blank">Get Adobe Flash player</a>';
+		_getid('emulator').innerHTML=s;				
+		return;
+	}*/
+		var flashvars={};
+		var flashvars2 = Object.keys(flashvars).map(function(k){
+			return encodeURIComponent(k) + '=' + encodeURIComponent(flashvars[k])
+		}).join('&');
+		var s='';
+		if (!okflash) s+='<div style="margin-bottom:5px"><font style="color:#aa2222">Adobe Flash Player is required. Check the flash player is installed.</font></div>';
+		s+='<object type="application/x-shockwave-flash" data="swf/Nesbox.swf" width="640" height="480" id="emulator" style="visibility: visible;"><param name="allowscriptaccess" value="sameDomain"><param name="allowFullScreen" value="true"><param name="allowFullScreenInteractive" value="true"><param name="flashvars" value="'+flashvars2+'"></object>';
+		_getid('codearea').innerHTML=s;
+
+/*	var params = {};
+	var attributes = {};
+	params.allowscriptaccess = 'sameDomain';
+	params.allowFullScreen = 'true';
+	params.allowFullScreenInteractive = 'true';
+	swfobject.embedSWF('swf/Nesbox.swf', 'emulator', '640', '480', '11.2.0', 'swf/expressInstall.swf', flashvars, params, attributes);*/
+}
+
+function proc_close(){
+	_getid('codearea').innerHTML='<div id="emulator"></div>';
+}
+function proc_refresh(){
+	if(g_lastdata2){
+		proc_loadgame(g_lastdata2.url, g_lastdata2.resp, true);
+	}
+}
+</script>
