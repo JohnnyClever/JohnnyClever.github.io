@@ -40,6 +40,7 @@
 	</style>
 
 </head>
+<body>
 <div class="container">
 
 	<p>
@@ -54,3 +55,62 @@
 			</div>
 		</div>
 	</p>
+<hr>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
+
+<script type="text/javascript">
+
+	var resizeOwnEmulator = function(width, height)
+	{
+		var emulator = $('#emulator');
+		emulator.css('width', width);
+		emulator.css('height', height);
+	}
+
+	$(function()
+	{
+		function embed()
+		{
+			var emulator = $('#emulator');
+			if(emulator)
+			{
+				var flashvars = {};
+				var params = {};
+				var attributes = {};
+				
+				params.allowscriptaccess = 'sameDomain';
+				params.allowFullScreen = 'true';
+				params.allowFullScreenInteractive = 'true';
+				
+				swfobject.embedSWF('/emulator/flash/flash/Nesbox.swf', 'emulator', '640', '480', '11.2.0', '/emulator/flash/flash/expressInstall.swf', flashvars, params, attributes);
+			}
+		}
+		
+		embed();
+	});
+	
+</script>
+
+	<div class="container">
+
+		<hr>
+			
+		<footer class="footer">
+			
+			<p class="pull-right" style="text-align:center;">
+				<a title="@nesboxcom" rel="tooltip" href="http://twitter.com/nesboxcom">twitter</a> <span class="text-muted">|</span>
+				<a href="http://facebook.com/nesbox">facebook</a> <span class="text-muted">|</span>
+				<a href="http://vk.com/nesboxclub">vkontakte</a> <span class="text-muted">|</span>
+				<a href="https://plus.google.com/+Nesbox">google+</a> <span class="text-muted">|</span>
+				<a title="support@nesbox.com" rel="tooltip" href="mailto:support@nesbox.com">support</a>
+			</p>
+			
+		    <p class="pull-left">&copy; 2015 Nesbox. All rights reserved.</a></p>
+		</footer>
+				
+	</div>
+	
+</body>
+</html>
