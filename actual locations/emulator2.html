@@ -12,13 +12,13 @@
 </script>
 <div id="flashContent">
     <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" height="480" id="FlashWrapper" width="640">
-        <param name="movie" value="https://sites.google.com/a/midlandps.org/ultimate-flash-games-at-school-rebirth/emulator/Nesbox.swf">
+        <param name="movie" value="JohnnyClever.github.io/nesbox/Nesbox.swf">
         <param name="quality" value="high">
         <param name="bgcolor" value="#ffffff">
         <param name="allowScriptAccess" value="always">
         <param name="allowFullScreen" value="true">
         <!--[if !IE]>-->
-        <object data="https://sites.google.com/a/midlandps.org/ultimate-flash-games-at-school-rebirth/emulator/Nesbox.swf" height="480" type="application/x-shockwave-flash" width="640">
+        <object data="JohnnyClever.github.io/nesbox/Nesbox.swf" height="480" type="application/x-shockwave-flash" width="640">
             <param name="quality" value="high">
             <param name="bgcolor" value="#ffffff">
             <param name="allowScriptAccess" value="always">
@@ -50,11 +50,7 @@
 			var emulator = $('#emulator');
 			if(emulator)
 			{
-				var flashvars = 
-				{
-					system : 'sega',
-					url : '/roms/Flappy Bird (PD) v1.0.gen'
-				};
+				var flashvars = {};
 				var params = {};
 				var attributes = {};
 				
@@ -62,7 +58,7 @@
 				params.allowFullScreen = 'true';
 				params.allowFullScreenInteractive = 'true';
 				
-				swfobject.embedSWF('nesbox/Nesbox.swf', 'emulator', '640', '480', '11.2.0', 'nesbox/expressInstall.swf', flashvars, params, attributes);
+				swfobject.embedSWF('JohnnyClever.github.io/nesbox/Nesbox.swf', 'emulator', '640', '480', '11.2.0', 'nesbox/expressInstall.swf', flashvars, params, attributes);
 			}
 		}
 		
