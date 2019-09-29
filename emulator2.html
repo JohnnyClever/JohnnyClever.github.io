@@ -1,3 +1,62 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<title>Nesbox - mobile and web development</title>
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+
+	<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+	<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+	<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	<link rel="shortcut icon" href="/img/favicon.ico">
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+	<style type="text/css">
+		body
+		{
+			padding-top: 50px;
+			padding-bottom: 20px;
+		}
+
+	</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+	<p>
+		<div class="hidden-xs hidden-sm">
+
+			<div id="emulator">
+				<p>To play this game, please, download the latest Flash player!</p>
+				<br>
+				<a href="http://www.adobe.com/go/getflashplayer">
+					<img src="//www.adobe.com/images/shared/download_buttons/get_adobe_flash_player.png" alt="Get Adobe Flash player"/>
+				</a>
+			</div>
+
+			<p>
+				<iframe src="//ghbtns.com/github-btn.html?user=nesbox&repo=emulator&type=watch&count=true&size=large" allowtransparency="true" frameborder="0" scrolling="0" width="170" height="30"></iframe>
+				<iframe src="//ghbtns.com/github-btn.html?user=nesbox&repo=emulator&type=fork&count=true&size=large" allowtransparency="true" frameborder="0" scrolling="0" width="170" height="30"></iframe>
+				
+<hr>
+
+</div>
+
 <script src="//ajax.googleapis.com/ajax/libs/swfobject/2.2/swfobject.js"></script>
 
 <script type="text/javascript">
@@ -24,11 +83,14 @@
 				params.allowFullScreen = 'true';
 				params.allowFullScreenInteractive = 'true';
 				
-				swfobject.embedSWF('/emulator/flash/flash/Nesbox.swf', 'emulator', '640', '480', '11.2.0', '/emulator/flash/flash/expressInstall.swf', flashvars, params, attributes);
+				swfobject.embedSWF('nesbox/Nesbox.swf', 'emulator', '640', '480', '11.2.0', 'nesbox/javascript_essentials/expressInstall.swf', flashvars, params, attributes);
 			}
 		}
 		
 		embed();
 	});
 	
-</script>
+</script>		
+</div>	
+</body>
+</html>
